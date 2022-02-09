@@ -1,3 +1,4 @@
+import 'package:aw_quality/src/core/config/routing.dart';
 import 'package:aw_quality/src/core/constants.dart';
 import 'package:aw_quality/src/core/repositories/aqi_repository.dart';
 import 'package:aw_quality/src/core/services/openweather_service.dart';
@@ -19,11 +20,9 @@ Future<void> main() async{
 
   Hive.openBox(hiveBox);
 
-  getIt.registerSingletonAsync<SharedPrefsService>(() async {
-    final service = SharedPrefsService();
-    await service.init();
-    return service;
-  });
+  getIt.registerSingleton<SharedPrefsService>(SharedPrefsService());
+
+  getIt.get<SharedPrefsService>().init();
 
   getIt.registerFactory<OpenweatherService>(() => OpenweatherServiceImpl());
 
@@ -45,55 +44,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(),
+      initialRoute: splashRoute,
+      onGenerateRoute: onGenerateRoute,
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('AW-KUALITI'),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onPressed,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-
-  Future<void> _onPressed() async {
-    // final repo = OpenweatherApiRepositoryImpl();
-    // final now = DateTime.now();
-
-    // final futures = <Future<AQIData?>>[];
-    // for(final location in locations){
-    //   futures.add(
-    //  final list = await   repo.getSingleLocationForecastAirQI(location: locations[2]);
-    //   );
-    // }
-
-
-    // final results = await Future.wait(futures);
-    //
-    // for(int i = 0; i < 5; i++){
-    //   log('${locations[i]} : index - ${results[i]?.index}');
-    // }
-
-    // final aqi = await repo.getAQIHistory(
-    //   location: locationTes,
-    //   startDate: now.subtract(const Duration(days: 5)),
-    //   endDate: now,
-    // );
   }
 }

@@ -12,7 +12,6 @@ class AQIData {
   AQIData({
     required this.location,
     required this.index,
-    required this.dateTime,
     required this.co,
     required this.no,
     required this.no2,
@@ -25,7 +24,6 @@ class AQIData {
 
   final String location;
   final int index;
-  final DateTime dateTime;
   final double co;
   final double no;
   final double no2;

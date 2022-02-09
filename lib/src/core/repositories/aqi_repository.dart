@@ -13,9 +13,9 @@ import '../utils/update_checker.dart';
 abstract class AQIRepository {
   Future<AQIList> fetchCurrentAQI();
 
-  Future<AQIList> fetchHistoryAQI();
+  Future<List<AQIList>> fetchHistoryAQI();
 
-  Future<AQIList> fetchForecastAQI();
+  Future<List<AQIList>> fetchForecastAQI();
 }
 
 class AQIRepositoryImpl implements AQIRepository {
@@ -28,18 +28,18 @@ class AQIRepositoryImpl implements AQIRepository {
   Future<AQIList> fetchCurrentAQI() async {
     AQIList result = AQIList.empty();
     try {
-      final lastRawUpdate = _prefsService.getInt(lastCurrentUpdateKey) ?? 0;
-
-      final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
-
-      final toUpdate = shouldUpdateCurrent(ts);
-      final now = DateTime.now();
-      if (toUpdate) {
-        result = await _fetchCurrentFromApi();
-      } else {
-        result = await _fetchFromHive(key: currentKey);
-      }
-      _prefsService.setInt(lastCurrentUpdateKey, now.millisecondsSinceEpoch);
+      // final lastRawUpdate = _prefsService.getInt(lastCurrentUpdateKey) ?? 0;
+      //
+      // final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
+      //
+      // final toUpdate = shouldUpdateCurrent(ts);
+      // final now = DateTime.now();
+      // if (toUpdate) {
+      result = await _fetchCurrentFromApi();
+      // } else {
+      //   result = await _fetchFromHive(key: currentKey);
+      // }
+      // _prefsService.setInt(lastCurrentUpdateKey, now.millisecondsSinceEpoch);
     } catch (e) {
       log('Error in fetching current aqi: $e');
     }
@@ -70,7 +70,6 @@ class AQIRepositoryImpl implements AQIRepository {
           final data = AQIData(
             location: locationsNames[i],
             index: responseData.main.index,
-            dateTime: responseData.timestamp,
             co: responseData.components.co,
             no: responseData.components.no,
             no2: responseData.components.no2,
@@ -91,68 +90,150 @@ class AQIRepositoryImpl implements AQIRepository {
     return result;
   }
 
-  Future<AQIList> _fetchFromHive({required dynamic key}) async {
-    final box = await Hive.openBox<AQIDataListHiveModel>(hiveBox);
-    final hiveModel = box.get(key, defaultValue: AQIDataListHiveModel())!;
-
-    final mappedList = hiveModel.data
-        .map(
-          (e) => AQIData(
-            location: e.location,
-            index: e.index,
-            dateTime: DateTime.fromMillisecondsSinceEpoch(e.timestamp),
-            co: e.co,
-            no: e.no,
-            no2: e.no2,
-            o3: e.o3,
-            so2: e.so2,
-            pm2_5: e.pm2_5,
-            pm10: e.pm10,
-            nh3: e.nh3,
-          ),
-        )
-        .toList();
-
-    return AQIList.fromList(mappedList);
-  }
-
   @override
-  Future<AQIList> fetchForecastAQI() async {
+  Future<List<AQIList>> fetchForecastAQI() async {
     try {
-      final lastRawUpdate = _prefsService.getInt(lastForecastUpdateKey) ?? 0;
+      // final lastRawUpdate = _prefsService.getInt(lastForecastUpdateKey) ?? 0;
 
-      final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
+      // final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
 
-      final toUpdate = shouldUpdateGlobal(ts);
-      if (toUpdate) {
-        return _fetchCurrentFromApi();
-      } else {
-        return _fetchFromHive(key: forecastKey);
-      }
+      // final toUpdate = shouldUpdateGlobal(ts);
+      // if (toUpdate) {
+      return _fetchMultiAQIFromApi(lastForecastUpdateKey);
+      // } else {
+      // return _fetchFromHive(key: forecastKey);
+      // }
     } catch (e) {
       log('Error in fetching forecast aqi: $e');
     }
 
-    return AQIList.empty();
+    return [];
   }
 
   @override
-  Future<AQIList> fetchHistoryAQI() async {
+  Future<List<AQIList>> fetchHistoryAQI() async {
+    final resultList = <AQIList>[];
     try {
-      final lastRawUpdate = _prefsService.getInt(lastHistoryUpdateKey) ?? 0;
+      // final lastRawUpdate = _prefsService.getInt(lastHistoryUpdateKey) ?? 0;
+      //
+      // final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
+      //
+      // final toUpdate = shouldUpdateGlobal(ts);
+      // if (toUpdate) {
+      return _fetchMultiAQIFromApi(lastHistoryUpdateKey);
+      //
+      // for (final list in temp) {
+      //   final filteredList = <AQIData>[];
+      //   for (int i = list.data.length - 1; i >= 0; i - 12) {
+      //     filteredList.add(list.data[i]);
+      //   }
+      //   print(filteredList.length);
+      //   resultList.add(AQIList.fromList(filteredList));
+      // }
 
-      final ts = DateTime.fromMillisecondsSinceEpoch(lastRawUpdate);
-
-      final toUpdate = shouldUpdateGlobal(ts);
-      if (toUpdate) {
-        // return _fetchCurrentFromApi();
-      } else {
-        return _fetchFromHive(key: historyKey);
-      }
+      // } else {
+      //   return _fetchFromHive(key: historyKey);
+      // }
     } catch (e) {
       log('Error in fetching history aqi: $e');
     }
 
-    return AQIList.empty();
+    return resultList;
+  }
+
+  Future<List<AQIList>> _fetchMultiAQIFromApi(String saveKey) async {
+    final result = <AQIList>[];
+
+    try {
+      final futures = <Future<AQIResponse?>>[];
+      final now = DateTime.now();
+
+      for (final location in locationsList) {
+        if (saveKey == lastHistoryUpdateKey) {
+          futures.add(
+            _openweatherService.getAQIHistory(
+              location: location,
+              startDate: now.subtract(const Duration(days: 3)),
+              endDate: now,
+            ),
+          );
+        } else {
+          futures.add(
+            _openweatherService.getForecastAirQI(location: location),
+          );
+        }
+      }
+
+      final responses = await Future.wait(futures);
+
+      _prefsService.setInt(lastHistoryUpdateKey, now.millisecondsSinceEpoch);
+
+      for (int i = 0; i < responses.length; i++) {
+        final response = responses[i];
+        if (response?.data.isNotEmpty ?? false) {
+          final mappedList = <AQIData>[];
+
+          int index = 0;
+          double co = 0;
+          double no = 0;
+          double no2 = 0;
+          double o3 = 0;
+          double so2 = 0;
+          double pm2_5 = 0;
+          double pm10 = 0;
+          double nh3 = 0;
+
+          int step = 0;
+          for (int j = 0; j < response!.data.length; j++) {
+            step++;
+            final item = response.data[j];
+
+            index += item.main.index;
+            co += item.components.co;
+            no += item.components.no;
+            no2 += item.components.no2;
+            o3 += item.components.o3;
+            so2 += item.components.so2;
+            pm2_5 += item.components.pm2_5;
+            pm10 += item.components.pm10;
+            nh3 += item.components.nh3;
+
+            int remainder = step % 12;
+            if (remainder == 0 || step == response.data.length) {
+              int avg = remainder == 0 ? 12 : remainder;
+              mappedList.add(
+                AQIData(
+                  location: locationsNames[i],
+                  index: index ~/ avg,
+                  co: co / avg,
+                  no: no / avg,
+                  no2: no2 / avg,
+                  o3: o3 / avg,
+                  so2: so2 / avg,
+                  pm2_5: pm2_5 / avg,
+                  pm10: pm10 / avg,
+                  nh3: nh3 / avg,
+                ),
+              );
+
+              index = 0;
+              co = 0;
+              no = 0;
+              no2 = 0;
+              o3 = 0;
+              so2 = 0;
+              pm2_5 = 0;
+              pm10 = 0;
+              nh3 = 0;
+            }
+          }
+          result.add(AQIList.fromList(mappedList));
+        }
+      }
+    } catch (e) {
+      log('Error fetching from api: $e');
+    }
+
+    return result;
   }
 }

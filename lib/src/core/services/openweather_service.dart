@@ -17,7 +17,7 @@ const String _paramsAppID = 'appid';
 abstract class OpenweatherService {
   Future<AQIResponse?> getSingleLocationAirQI({required Location location});
 
-  Future<AQIResponse?> getSingleLocationForecastAirQI({
+  Future<AQIResponse?> getForecastAirQI({
     required Location location,
   });
 
@@ -95,7 +95,7 @@ class OpenweatherServiceImpl implements OpenweatherService {
   }
 
   @override
-  Future<AQIResponse?> getSingleLocationForecastAirQI({
+  Future<AQIResponse?> getForecastAirQI({
     required Location location,
   }) async {
     try {

@@ -1,13 +1,23 @@
 import 'models/common/location.dart';
 
+// Routes
+
+const String splashRoute = '/splash';
+const String homeRoute = '/';
+const String currentAQIRoute = '/current';
+const String historyRoute = '/history';
+const String historyDetailsRoute = '/history';
+const String forecastRoute = '/forecast';
+const String detailsRoute = '/details';
+
 // Location related constants
 
-const String tes = 'tes';
-const String dniprovka = 'Dniprovka';
-const String nicopol = 'Nicopol';
-const String rogachik = 'Rogachik';
-const String vasilivka = 'vasilivka';
-const String zaporizhya = 'zaporizhya';
+const String tes = 'ТЕС';
+const String dniprovka = 'Дніпровка';
+const String nicopol = 'Нікополь';
+const String rogachik = 'Верхній Рогачик';
+const String vasilivka = 'Василівка';
+const String zaporizhya = 'Запоріжжя';
 const Location locationTes = Location(lat: 47.5066, lon: 34.6325);
 const Location locationDniprovka = Location(lat: 47.4307, lon: 34.6111);
 const Location locationNicopol = Location(lat: 47.5692, lon: 34.3919);
