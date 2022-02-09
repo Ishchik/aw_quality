@@ -32,11 +32,14 @@ class AQIDiagramList extends StatelessWidget {
                 ),
               );
             },
-            child: DiagramTile(
-              list: data.map((e) => e.index).toList(),
-              title: data.first.location,
-              maxY: 6,
-              type: DiagramType.aqi,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: data.map((e) => e.index).toList(),
+                title: data.first.location,
+                maxY: 6,
+                type: DiagramType.aqi,
+              ),
             ),
           );
         }

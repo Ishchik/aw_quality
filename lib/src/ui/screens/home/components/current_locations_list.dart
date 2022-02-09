@@ -17,7 +17,8 @@ class CurrentLocationsList extends StatelessWidget {
       itemBuilder: (_, index) {
         final item = list[index];
 
-        return ConstrainedBox(
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
           constraints: const BoxConstraints(minHeight: 120.0),
           child: Card(
             child: Row(

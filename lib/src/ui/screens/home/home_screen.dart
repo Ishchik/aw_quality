@@ -18,7 +18,7 @@ const pages = <Widget>[
 ];
 
 class _HomeScreenState extends State<HomeScreen> {
-  int index = 2;
+  int index = 0;
 
   @override
   Widget build(BuildContext context) {

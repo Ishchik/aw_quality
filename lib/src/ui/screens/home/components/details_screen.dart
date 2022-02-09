@@ -33,41 +33,59 @@ class DetailsScreen extends StatelessWidget {
       body: SafeArea(
         child: ListView(
           children: [
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'SO2',
-              maxY: 500,
-              type: DiagramType.so2,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'SO2',
+                maxY: 500,
+                type: DiagramType.so2,
+              ),
             ),
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'PM10',
-              maxY: 100,
-              type: DiagramType.pm10,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'PM10',
+                maxY: 100,
+                type: DiagramType.pm10,
+              ),
             ),
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'PM2.5',
-              maxY: 60,
-              type: DiagramType.pm2_5,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'PM2.5',
+                maxY: 60,
+                type: DiagramType.pm2_5,
+              ),
             ),
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'NO2',
-              maxY: 400,
-              type: DiagramType.no2,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'NO2',
+                maxY: 400,
+                type: DiagramType.no2,
+              ),
             ),
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'CO',
-              maxY: 30,
-              type: DiagramType.co,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'CO',
+                maxY: 30,
+                type: DiagramType.co,
+              ),
             ),
-            DiagramTile(
-              list: list.map((e) => e.so2).toList(),
-              title: 'O3',
-              maxY: 240,
-              type: DiagramType.o3,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: DiagramTile(
+                list: list.map((e) => e.so2).toList(),
+                title: 'O3',
+                maxY: 240,
+                type: DiagramType.o3,
+              ),
             ),
           ],
         ),
